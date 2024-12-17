@@ -21,6 +21,16 @@
 
 body {
 	font-family: var(--font-family-default);
+	min-height: 100vh;
+	min-width: 100vw;
+	background-color: #f2f2f2;
+	background-image: radial-gradient(
+		circle,
+		rgba(0, 0, 0, 0.083) 1px,
+		transparent 1px
+	);
+	background-size: 20px 20px; /* Adjust the dot spacing */
+	background-position: center;
 }
 
 code,

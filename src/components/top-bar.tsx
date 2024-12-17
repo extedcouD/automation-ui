@@ -1,5 +1,16 @@
 import { useState } from "react";
 
+interface NavLink {
+	label: string;
+	href: string;
+}
+
+const navLinks: NavLink[] = [
+	{ label: "Contact", href: "/contact" },
+	{ label: "Contirbute", href: "/contribute" },
+	{ label: "FAQs", href: "/faq" },
+];
+
 const TopBar = () => {
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -12,8 +23,8 @@ const TopBar = () => {
 						alt="Logo"
 						className="h-10 w-auto"
 					/>
-					<h2 className="text-2xl font-bold text-transparent bg-gradient-to-r from-sky-600 to-sky-400 bg-clip-text ml-4">
-						Automation Tool
+					<h2 className="text-2xl font-black text-transparent bg-gradient-to-r from-sky-600 to-sky-400 bg-clip-text ml-4">
+						AUTOMATION TOOL
 					</h2>
 				</div>
 
@@ -61,38 +72,13 @@ const TopBar = () => {
 							: "hidden md:flex-row"
 					}`}
 				>
-					<li>
-						<a
-							href="#home"
-							className="text-gray-700 hover:text-blue-500 block py-2"
-						>
-							Home
-						</a>
-					</li>
-					<li>
-						<a
-							href="#about"
-							className="text-gray-700 hover:text-blue-500 block py-2"
-						>
-							About
-						</a>
-					</li>
-					<li>
-						<a
-							href="#services"
-							className="text-gray-700 hover:text-blue-500 block py-2"
-						>
-							Services
-						</a>
-					</li>
-					<li>
-						<a
-							href="#contact"
-							className="text-gray-700 hover:text-blue-500 block py-2"
-						>
-							Contact
-						</a>
-					</li>
+					{navLinks.map((link, index) => (
+						<li key={index}>
+							<a className="text-gray-700 hover:text-blue-500 block py-2">
+								{link.label}
+							</a>
+						</li>
+					))}
 				</ul>
 			</nav>
 		</header>

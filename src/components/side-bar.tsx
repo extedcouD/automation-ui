@@ -1,5 +1,7 @@
-import React from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import React, { useEffect } from "react";
+
+import { useLocation, useNavigate } from "react-router-dom";
+import SidebarHeader from "./ui/side-bar-header";
 
 interface Tab {
 	id: string;
@@ -22,19 +24,25 @@ const Sidebar: React.FC<SidebarProps> = ({
 	activeTab,
 	setActiveTab,
 }) => {
+	const location = useLocation();
+	// Sync activeTab with the URL path
+	useEffect(() => {
+		console.log(location.pathname);
+		const currentTab = tabs.find((tab) => `/${tab.id}` === location.pathname);
+		if (currentTab) {
+			setActiveTab(currentTab.id);
+		}
+	}, [location.pathname, tabs, setActiveTab]);
+
+	const navigate = useNavigate();
+
 	return (
 		<div
 			className={`fixed top-16 left-0 mt-1 h-full bg-white shadow-md transition-all duration-300 ${
 				isOpen ? "w-64" : "w-20"
 			} flex flex-col`}
 		>
-			{/* Sidebar Header */}
-			<div className="flex items-center justify-between p-4 border-b border-gray-200">
-				<button onClick={toggle} className="text-gray-700 focus:outline-none">
-					{isOpen ? <FaChevronLeft /> : <FaChevronRight />}
-				</button>
-			</div>
-
+			<SidebarHeader isOpen={isOpen} toggle={toggle} />
 			<nav className="flex-1 mt-4">
 				<ul className="space-y-2">
 					{tabs.map((tab) => (
@@ -42,6 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 							<button
 								onClick={() => {
 									setActiveTab(tab.id);
+									navigate(`/${tab.id}`);
 								}}
 								className={`relative flex items-center p-3 w-full text-gray-700 hover:bg-blue-200 hover:text-blue-700 transition-all duration-300 ease-in-out rounded-md 
                                 ${
@@ -50,7 +59,6 @@ const Sidebar: React.FC<SidebarProps> = ({
 																		: "hover:shadow-[0_0_8px_rgba(59,130,246,0.4)]"
 																}`}
 							>
-								{/* Icon */}
 								<span
 									className={`transition-transform duration-300 ${
 										activeTab === tab.id ? "scale-110 text-blue-600" : ""
@@ -82,7 +90,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
 			{/* Footer */}
 			<div className="p-4 border-t border-gray-200">
-				{isOpen && <p className="text-gray-500 text-sm">© 2024 Your Company</p>}
+				{isOpen && <p className="text-gray-500 text-sm">© 2024 ONDC</p>}
 			</div>
 		</div>
 	);

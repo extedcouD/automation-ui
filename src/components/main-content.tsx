@@ -38,10 +38,10 @@ const MainContent = () => {
 					},
 				]}
 			/>
-			{/* Main Content */}
+
 			<div
-				className={`flex-1 p-2 transition-all duration-300 ${
-					isSidebarOpen ? " ml-40" : "ml-5"
+				className={`flex-1 p-2 mt-2 transition-all duration-300 ${
+					isSidebarOpen ? " ml-64" : "ml-20"
 				}`}
 			>
 				<GetMainContent activeTab={activeTab} />

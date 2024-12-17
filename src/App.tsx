@@ -7,7 +7,7 @@ function App() {
 	return (
 		<>
 			<TopBar />
-			<main className="pt-16 h-full flex">
+			<main className=" pt-16 h-full flex">
 				<MainContent />
 			</main>
 			<ToastContainer
