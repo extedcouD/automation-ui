@@ -4,6 +4,7 @@ import Sidebar from "./side-bar";
 import { FaHome } from "react-icons/fa";
 import { TbTestPipe2Filled } from "react-icons/tb";
 import { GoWorkflow } from "react-icons/go";
+import { PiNetwork } from "react-icons/pi";
 
 const MainContent = () => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar starts expanded
@@ -35,6 +36,11 @@ const MainContent = () => {
 						id: "test",
 						label: "Unit Api Testing",
 						icon: <TbTestPipe2Filled className="text-xl" />,
+					},
+					{
+						id: "flowsWorkbench",
+						label: "Custom Flow Workbench",
+						icon: <PiNetwork className="text-xl" />,
 					},
 				]}
 			/>
