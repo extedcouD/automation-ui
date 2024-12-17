@@ -38,8 +38,29 @@ const MainContent = () => {
 					},
 				]}
 			/>
+			{/* Main Content */}
+			<div
+				className={`flex-1 p-2 transition-all duration-300 ${
+					isSidebarOpen ? " ml-40" : "ml-5"
+				}`}
+			>
+				<GetMainContent activeTab={activeTab} />
+			</div>
 		</div>
 	);
 };
+
+function GetMainContent({ activeTab }: { activeTab: string }) {
+	switch (activeTab) {
+		case "home":
+			return <h1>Add Home</h1>;
+		case "flows":
+			return <h1>Add Flows</h1>;
+		case "test":
+			return <h1>Add Test</h1>;
+		default:
+			return <h1> Invalid Tab</h1>;
+	}
+}
 
 export default MainContent;

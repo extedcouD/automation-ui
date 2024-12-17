@@ -40,7 +40,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 					{tabs.map((tab) => (
 						<li key={tab.id}>
 							<button
-								onClick={() => setActiveTab(tab.id)}
+								onClick={() => {
+									setActiveTab(tab.id);
+								}}
 								className={`relative flex items-center p-3 w-full text-gray-700 hover:bg-blue-200 hover:text-blue-700 transition-all duration-300 ease-in-out rounded-md 
                                 ${
 																	activeTab === tab.id
