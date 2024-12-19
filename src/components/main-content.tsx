@@ -5,7 +5,11 @@ import { FaHome } from "react-icons/fa";
 import { TbTestPipe2Filled } from "react-icons/tb";
 import { GoWorkflow } from "react-icons/go";
 import { PiNetwork } from "react-icons/pi";
+
 import ApiTesting from "./api-testing";
+import NotFoundPage from "./ui/not-found";
+import FlowContent from "./flow-testing/flow-page";
+
 
 const MainContent = () => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar starts expanded
@@ -15,7 +19,7 @@ const MainContent = () => {
 	};
 
 	return (
-		<div className="flex h-full">
+		<div className="flex h-full w-screen">
 			{/* Sidebar */}
 			<Sidebar
 				isOpen={isSidebarOpen}
@@ -30,7 +34,7 @@ const MainContent = () => {
 					},
 					{
 						id: "flows",
-						label: "Test Flows",
+						label: "Flow Challenges",
 						icon: <GoWorkflow className="text-xl" />,
 					},
 					{
@@ -62,11 +66,11 @@ function GetMainContent({ activeTab, isSidebarOpen }: { activeTab: string; isSid
 		case "home":
 			return <h1>Add Home</h1>;
 		case "flows":
-			return <h1>Add Flows</h1>;
+			return <FlowContent />;
 		case "test":
 			return <ApiTesting isSidebarOpen={isSidebarOpen}/>;
 		default:
-			return <h1> Invalid Tab</h1>;
+			return <NotFoundPage />;
 	}
 }
 

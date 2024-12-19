@@ -23,7 +23,12 @@ const TopBar = () => {
 						alt="Logo"
 						className="h-10 w-auto"
 					/>
-					<h2 className="text-2xl font-black text-transparent bg-gradient-to-r from-sky-600 to-sky-400 bg-clip-text ml-4">
+					<h2
+						className="text-2xl text-transparent bg-gradient-to-r from-sky-600 to-sky-400 bg-clip-text ml-4"
+						style={{
+							fontWeight: "1000",
+						}}
+					>
 						AUTOMATION TOOL
 					</h2>
 				</div>
