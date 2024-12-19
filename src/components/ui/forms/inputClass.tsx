@@ -1,13 +1,14 @@
 export const inputClass = `
-  block w-full p-2 mt-2 border shadow-sm
-  border-gray-400 dark:border-gray-600
-  bg-white dark:bg-gray-800
-  text-black dark:text-white
-  focus:border-blue-600 dark:focus:border-blue-400
-  focus:ring focus:ring-blue-500 dark:focus:ring-blue-300 focus:ring-opacity-50
-  transition-colors duration-300
+  w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border 
+  border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none 
+  focus:border-blue-500 hover:border-blue-300 shadow-sm focus:shadow
 `.trim();
 
 export const labelClass = `
-  text-m font-medium dark:text-gray-300
+  text-sm
+  font-medium
+  text-sky-700
+  ml-1
+  mb-1
+  dark:text-gray-300
 `.trim();

@@ -37,7 +37,8 @@ const FormInput = ({
 				id={name}
 				type={type}
 				className={inputClass}
-				onChange={handleChange} // Apply custom onChange to handle value transformation
+				placeholder="Type here..."
+				onChange={handleChange}
 				onKeyDown={(e) => {
 					e.stopPropagation();
 				}}
