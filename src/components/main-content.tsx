@@ -5,6 +5,7 @@ import { FaHome } from "react-icons/fa";
 import { TbTestPipe2Filled } from "react-icons/tb";
 import { GoWorkflow } from "react-icons/go";
 import { PiNetwork } from "react-icons/pi";
+import ApiTesting from "./api-testing";
 
 const MainContent = () => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar starts expanded
@@ -50,20 +51,20 @@ const MainContent = () => {
 					isSidebarOpen ? " ml-64" : "ml-20"
 				}`}
 			>
-				<GetMainContent activeTab={activeTab} />
+				<GetMainContent activeTab={activeTab} isSidebarOpen={isSidebarOpen}/>
 			</div>
 		</div>
 	);
 };
 
-function GetMainContent({ activeTab }: { activeTab: string }) {
+function GetMainContent({ activeTab, isSidebarOpen }: { activeTab: string; isSidebarOpen: boolean }) {
 	switch (activeTab) {
 		case "home":
 			return <h1>Add Home</h1>;
 		case "flows":
 			return <h1>Add Flows</h1>;
 		case "test":
-			return <h1>Add Test</h1>;
+			return <ApiTesting isSidebarOpen={isSidebarOpen}/>;
 		default:
 			return <h1> Invalid Tab</h1>;
 	}
