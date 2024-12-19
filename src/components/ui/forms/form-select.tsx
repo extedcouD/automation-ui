@@ -1,5 +1,6 @@
 import React from "react";
-import { inputClass, LabelWithToolTip } from "./form-input";
+import { LabelWithToolTip } from "./form-input";
+import { inputClass } from "./inputClass";
 
 const FormSelect = ({
 	register = (_: any) => {},
@@ -26,7 +27,6 @@ const FormSelect = ({
 					defaultValue={defaultValue}
 				>
 					{options.map((option: string, index: number) => {
-						// if default prop is passed it will set defulat value in select
 						if (defaultValue === option)
 							return (
 								<option selected value={option} key={index}>
