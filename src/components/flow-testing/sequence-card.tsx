@@ -80,7 +80,7 @@ const StateCard: React.FC<{
 
 function SequenceCard({ step, pair }: SequenceCardProps) {
 	return (
-		<div className="flex items-center space-x-4 bg-white p-4  ">
+		<div className="flex items-center space-x-4 bg-white p-1">
 			{/* Step Card */}
 			<StateCard data={step} />
 

@@ -189,7 +189,7 @@ function Accordion({
 					onClick={() => setIsOpen(!isOpen)}
 					className="flex items-center justify-between flex-1"
 				>
-					<pre className="text-base font-medium">Flow Id: {flow.id}</pre>
+					<h3 className="text-base font-medium">Flow Id: {flow.id}</h3>
 					<div className="flex">
 						{!activeFlow && (
 							<button
