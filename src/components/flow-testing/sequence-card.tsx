@@ -49,10 +49,18 @@ const StateCard: React.FC<{
 	const styles = getStateStyles(data.state);
 
 	return (
-		<div className={`${styles.className} rounded-md p-4 flex-1 h-40`}>
+		<div className={`${styles.className} rounded-md p-4 flex-1 h-40 relative`}>
+			{/* Loader */}
+			{data.state === "pending" && (
+				<div className="absolute bottom-2 right-2">
+					<div className="w-7 h-7 border-2 border-t-2 border-gray-300 border-t-yellow-500 rounded-full animate-spin"></div>
+				</div>
+			)}
+
+			{/* Main Content */}
 			<div className="flex items-center mb-2">
 				{styles.icon}
-				<h3 className={`text-lg font-semibold  ml-2`}>
+				<h3 className={`text-lg font-semibold ml-2`}>
 					{data.stepIndex}
 					{"."} {data.type}
 				</h3>
