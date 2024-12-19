@@ -12,7 +12,6 @@ import { HiOutlineDocumentReport } from "react-icons/hi";
 import { TbFileInfo } from "react-icons/tb";
 import { toast } from "react-toastify";
 import Heading from "../ui/mini-components/ondc-gradient-text";
-import FormCheckbox from "../ui/forms/form-checkbox";
 import DifficultyForm from "./difficulty-form";
 
 export default function FlowContent() {
@@ -83,7 +82,7 @@ export default function FlowContent() {
 							<FormSelect
 								name="participantType"
 								label="Select Type"
-								options={["BAP", "BPP"]}
+								options={["BPP", "BAP"]}
 								required
 							/>
 							<FormSelect
@@ -105,6 +104,7 @@ export default function FlowContent() {
 							submitFunction={async () => {
 								setStep((s) => s + 1);
 							}}
+							subUrl={subUrl}
 						/>
 					</div>
 				);

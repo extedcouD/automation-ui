@@ -1,6 +1,8 @@
 // src/DifficultyForm.tsx
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { inputClass } from "../ui/forms/inputClass";
+import { putCacheData } from "../../utils/request-utils";
+import { toast } from "react-toastify";
 
 type Option = {
 	label: string;
@@ -29,7 +31,7 @@ const difficultyOptions: DifficultyOption[] = [
 	{
 		id: "sensitiveTTL",
 		label: "Sensitive TTL",
-		description: "Validates the Time-To-Live values for sensitivity.",
+		description: "every async call has a very sensitve ttl.",
 		options: [
 			{ label: "No", value: "no", points: 0 },
 			{ label: "Yes", value: "yes", points: 15 },
@@ -38,7 +40,7 @@ const difficultyOptions: DifficultyOption[] = [
 	{
 		id: "timeValidations",
 		label: "Time Validations",
-		description: "Performs time-based validations.",
+		description: "perform context timestamp validations.",
 		options: [
 			{ label: "No", value: "no", points: 0 },
 			{ label: "Yes", value: "yes", points: 25 },
@@ -47,18 +49,38 @@ const difficultyOptions: DifficultyOption[] = [
 	{
 		id: "protocolValidations",
 		label: "Protocol Validations",
-		description: "Validates the protocols used.",
+		description: "Get Nacks for breaking ondc specifications.",
 		options: [
 			{ label: "No", value: "no", points: 0 },
 			{ label: "Yes", value: "yes", points: 30 },
+		],
+	},
+	{
+		id: "useGateway",
+		label: "Use Gateway",
+		description: "Use the gateway for first search",
+		options: [
+			{ label: "No", value: "no", points: 0 },
+			{ label: "Yes", value: "yes", points: 10 },
+		],
+	},
+	{
+		id: "headerValidaton",
+		label: "Header Validations",
+		description: "perform header validations.",
+		options: [
+			{ label: "No", value: "no", points: 0 },
+			{ label: "Yes", value: "yes", points: 20 },
 		],
 	},
 ];
 
 const DifficultyForm = ({
 	submitFunction,
+	subUrl,
 }: {
 	submitFunction: () => Promise<void>;
+	subUrl: string;
 }) => {
 	const [selections, setSelections] = useState<Record<string, string>>({});
 	const [totalDifficulty, setTotalDifficulty] = useState<number>(0);
@@ -102,16 +124,28 @@ const DifficultyForm = ({
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
-		await submitFunction();
-		// const dataToSend = {
-		// 	selections,
-		// 	totalDifficulty,
-		// };
+		const final: Record<string, boolean> = {};
+		Object.keys(selections).forEach((element) => {
+			final[element] = selections[element] === "yes";
+		});
+		const dataToSend = {
+			...final,
+			totalDifficulty,
+		};
+		try {
+			const response = await putCacheData({ difficulty: dataToSend }, subUrl);
+			console.log("diff response", response);
+			await submitFunction();
+		} catch (e) {
+			console.error("error while sending response", e);
+			toast.error("Error while setting difficulty");
+		}
+		console.log(dataToSend);
 	};
 
 	return (
 		<div className=" mt-2 p-2">
-			<form onSubmit={handleSubmit} className="space-y-6">
+			<form onSubmit={handleSubmit} className="space-y-2">
 				{difficultyOptions.map((option) => (
 					<div key={option.id} className="flex flex-col">
 						<label

@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FetchFlowsResponse, Flow, SequenceStep } from "../../types/flow-types";
 import InfoCard from "../ui/info-card";
 import SequenceCard from "./sequence-card";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { CacheSessionData } from "../../types/session-types";
+import { putCacheData, triggerSearch } from "../../utils/request-utils";
 
 interface SessionData {
 	city: string;
@@ -21,27 +23,23 @@ function RenderFlows({
 	subUrl: string;
 }) {
 	const [sessionData, setSessionData] = useState<SessionData | null>(null);
-	const [acitveFlow, setActiveFlow] = useState<string | null>(null);
+	const [activeFlow, setActiveFlow] = useState<string | null>(null);
+	const activeFlowRef = useRef<string | null>(activeFlow);
+	const [cacheData, setCacheData] = useState<CacheSessionData | null>(null);
 	useEffect(() => {
-		FetchSessionData();
+		fetchSessionData();
 	}, [subUrl]);
 
 	useEffect(() => {
-		if (acitveFlow) {
-			axios
-				.put(
-					`${import.meta.env.VITE_BACKEND_URL}/sessions`,
-					{
-						flowId: acitveFlow,
-					},
-					{
-						params: {
-							subscriber_url: subUrl,
-						},
-					}
-				)
+		if (activeFlow) {
+			putCacheData(
+				{
+					flowId: activeFlow,
+				},
+				subUrl
+			)
 				.then((response) => {
-					toast.success(`${acitveFlow} has started`);
+					toast.success(`${activeFlow} has started`);
 					console.log("response", response.data);
 				})
 				.catch((e) => {
@@ -49,8 +47,47 @@ function RenderFlows({
 					toast.error("Error while updating session");
 				});
 		}
-	}, [acitveFlow, subUrl]);
-	function FetchSessionData() {
+	}, [activeFlow, subUrl]);
+
+	// Update the ref whenever activeFlow changes
+	useEffect(() => {
+		activeFlowRef.current = activeFlow;
+	}, [activeFlow]);
+
+	useEffect(() => {
+		// Call fetchData initially
+		fetchPayloads();
+
+		// Set interval to call fetchData every 3 seconds
+		const intervalId = setInterval(fetchPayloads, 3000);
+
+		// Cleanup interval on component unmount
+		return () => clearInterval(intervalId);
+	}, []); // Empty dependency array ensures this runs once
+
+	async function fetchPayloads() {
+		try {
+			console.log("activeFlow", activeFlowRef.current);
+			if (activeFlowRef.current === null) return;
+
+			const response = await axios.get(
+				`${import.meta.env.VITE_BACKEND_URL}/sessions`,
+				{ params: { subscriber_url: subUrl } }
+			);
+			const data: CacheSessionData = {
+				subscriberUrl: subUrl,
+				...response.data,
+			};
+
+			setCacheData(data);
+			console.log("response", response.data);
+		} catch (e) {
+			toast.error("Error while fetching payloads");
+			console.log("error while fetching payloads", e);
+		}
+	}
+
+	function fetchSessionData() {
 		axios
 			.get(`${import.meta.env.VITE_BACKEND_URL}/sessions`, {
 				params: {
@@ -66,35 +103,45 @@ function RenderFlows({
 					}, {});
 				delete filteredData["active_session_id"];
 				setSessionData(filteredData);
+				setCacheData(response.data);
 				console.log("sessionData", filteredData);
 			});
 	}
+
 	return (
-		<div>
+		<div className=" w-full">
 			{sessionData ? (
 				<InfoCard
 					data={{
 						...sessionData,
 						SubscriberUrl: subUrl,
-						acitveFlow: acitveFlow || "N/A",
+						acitveFlow: activeFlow || "N/A",
 					}}
 				/>
 			) : (
 				<div>Loading...</div>
 			)}
-			<div className="mt-2">
-				{flows.domain.map((domain) => (
-					<div key={domain.name} className="mb-8">
-						{domain.flows.map((flow) => (
-							<Accordion
-								key={flow.id}
-								flow={flow}
-								acitveFlow={acitveFlow}
-								setActiveFlow={setActiveFlow}
-							/>
-						))}
-					</div>
-				))}
+			<div className="flex flex-wrap w-full">
+				<div className="mt-2 w-[50%]">
+					{flows.domain.map((domain) => (
+						<div key={domain.name} className="mb-8">
+							{domain.flows.map((flow) => (
+								<Accordion
+									key={flow.id}
+									flow={flow}
+									activeFlow={activeFlow}
+									setActiveFlow={setActiveFlow}
+									cacheData={cacheData}
+								/>
+							))}
+						</div>
+					))}
+				</div>
+				<div className="w-full sm:w-[50%] break-words bg-black h-screen overflow-auto">
+					<pre className=" text-white">
+						{JSON.stringify(cacheData, null, 2)}
+					</pre>
+				</div>
 			</div>
 		</div>
 	);
@@ -103,31 +150,38 @@ function RenderFlows({
 // Accordion component for each flow
 interface AccordionProps {
 	flow: Flow;
-	acitveFlow: string | null;
+	activeFlow: string | null;
 	setActiveFlow: (flowId: string | null) => void;
+	cacheData?: CacheSessionData | null;
 }
 
-function Accordion({ flow, acitveFlow, setActiveFlow }: AccordionProps) {
+function Accordion({
+	flow,
+	activeFlow,
+	setActiveFlow,
+	cacheData,
+}: AccordionProps) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	// Process the sequence to align steps with their pairs
 	const steps = getOrderedSteps(flow.sequence);
 
-	const getPair = (
-		stepPair: {
-			step: SequenceStep;
-			pair?: SequenceStep;
-		},
-		state: "error" | "success" | "pending"
-	) => {
-		if (!stepPair.pair) {
-			return undefined;
+	const startFlow = async () => {
+		setActiveFlow(flow.id);
+		if (!cacheData) return;
+		if (!cacheData.session_payloads[flow.id]) return;
+		try {
+			if (cacheData.session_payloads[flow.id].length === 0) {
+				await triggerSearch(cacheData);
+			}
+		} catch {
+			toast.error("Error while starting flow");
 		}
-		return { ...stepPair.pair, state };
 	};
-
+	let stepIndex = 0;
+	if (!cacheData) return <div>Loading...</div>;
 	return (
-		<div className="rounded-md border border-zinc-300 mb-4 shadow-lg w-3/5">
+		<div className="rounded-md border border-zinc-300 mb-4 shadow-lg w-full ml-1">
 			{/* Flex container for header and Run button */}
 			<div className="flex items-center justify-between px-4 py-3 bg-gray-100 hover:bg-gray-200">
 				{/* Header button */}
@@ -136,42 +190,45 @@ function Accordion({ flow, acitveFlow, setActiveFlow }: AccordionProps) {
 					className="flex items-center justify-between flex-1"
 				>
 					<pre className="text-base font-medium">Flow Id: {flow.id}</pre>
-					<svg
-						className={`w-6 h-6 transform transition-transform duration-200 ${
-							isOpen ? "rotate-180" : ""
-						}`}
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M5 15l7-7 7 7"
-						/>
-					</svg>
-				</button>
-
-				{!acitveFlow && (
-					<button
-						onClick={() => setActiveFlow(flow.id)}
-						className=" text-sky-600 border border-sky-600 p-1 ml-4 rounded hover:bg-sky-600 hover:text-white transition-colors"
-					>
-						start
-					</button>
-				)}
-				{
-					// If the flow is active, show a "Stop" button instead
-					acitveFlow === flow.id && (
-						<button
-							onClick={() => setActiveFlow(null)}
-							className=" text-red-500 border border-red-500 p-1 ml-4 rounded hover:bg-red-500 hover:text-white transition-colors"
+					<div className="flex">
+						{!activeFlow && (
+							<button
+								onClick={async () => await startFlow()}
+								className=" mr-2 text-sky-600 border border-sky-600 p-1 ml-4 rounded hover:bg-sky-600 hover:text-white transition-colors"
+							>
+								start
+							</button>
+						)}
+						{
+							// If the flow is active, show a "Stop" button instead
+							activeFlow === flow.id && (
+								<>
+									<button
+										onClick={() => setActiveFlow(null)}
+										className="mr-2 text-red-500 border border-red-500 p-1 ml-4 rounded hover:bg-red-500 hover:text-white transition-colors flex justify-start items-center"
+									>
+										stop
+									</button>
+								</>
+							)
+						}
+						<svg
+							className={`w-6 h-6 transform transition-transform duration-200 ${
+								isOpen ? "rotate-180" : ""
+							}`}
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
 						>
-							stop
-						</button>
-					)
-				}
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M5 15l7-7 7 7"
+							/>
+						</svg>
+					</div>
+				</button>
 			</div>
 
 			{/* Accordion content */}
@@ -179,15 +236,30 @@ function Accordion({ flow, acitveFlow, setActiveFlow }: AccordionProps) {
 				<div className="px-4 py-5 bg-white">
 					<p className="text-gray-700 mb-6">{flow.description}</p>
 					<div className="space-y-4 relative">
-						{steps.map((stepPair, index) => (
-							<div key={index}>
-								<SequenceCard
-									step={{ ...stepPair.step, state: "error" }}
-									pair={getPair(stepPair, "success")}
-									onViewDetails={() => "hello"}
-								/>
-							</div>
-						))}
+						{steps.map((stepPair, index) => {
+							stepIndex += 2;
+							const pairData = stepPair.pair
+								? {
+										...stepPair.pair,
+										stepIndex: stepIndex,
+										cachedData: cacheData,
+										flowId: flow.id,
+								  }
+								: undefined;
+							return (
+								<div key={index}>
+									<SequenceCard
+										step={{
+											...stepPair.step,
+											stepIndex: stepIndex - 1,
+											cachedData: cacheData,
+											flowId: flow.id,
+										}}
+										pair={pairData}
+									/>
+								</div>
+							);
+						})}
 					</div>
 				</div>
 			)}
