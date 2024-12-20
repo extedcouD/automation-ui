@@ -32,7 +32,7 @@ const ApiTesting = ({ isSidebarOpen }: IProps) => {
     try {
       setIsLoading(true);
       const response = await axios.post(
-        `https://bd6f-182-156-19-250.ngrok-free.app/test/${action}`,
+        `${import.meta.env.VITE_BACKEND_URL}/flow/validate/${action}`,
         parsedPayload
       );
       setResponseValue(JSON.stringify(response.data, null, 2));
