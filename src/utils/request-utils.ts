@@ -7,22 +7,18 @@ export const triggerSearch = async (session: CacheSessionData) => {
 		return;
 	}
 
-	try {
-		toast.info("search triggered");
-		const data = {
-			subscriberUrl: session.subscriberUrl,
-			initiateSearch: true,
-		};
+	const data = {
+		subscriberUrl: session.subscriberUrl,
+		initiateSearch: true,
+	};
 
-		const response = await axios.post(
-			`${import.meta.env.VITE_BACKEND_URL}/flow/trigger`,
-			data
-		);
+	const response = await axios.post(
+		`${import.meta.env.VITE_BACKEND_URL}/flow/trigger`,
+		data
+	);
+	toast.info("search triggered");
 
-		console.log("trigger response", response);
-	} catch (e) {
-		console.log("errror", e);
-	}
+	console.log("trigger response", response);
 };
 
 export const putCacheData = async (data: any, subUrl: string) => {

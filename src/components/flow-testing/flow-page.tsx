@@ -13,12 +13,14 @@ import { TbFileInfo } from "react-icons/tb";
 import { toast } from "react-toastify";
 import Heading from "../ui/mini-components/ondc-gradient-text";
 import DifficultyForm from "./difficulty-form";
+import { ReportPage } from "./report";
 
 export default function FlowContent() {
 	const [step, setStep] = useState(0);
 	const [session, setSession] = useState<string | null>(null);
 	const [subUrl, setSubUrl] = useState<string>("");
 	const [flows, setFlows] = useState<FetchFlowsResponse | null>(null);
+
 	const onSubmit = async (data: any) => {
 		try {
 			console.log("data", data);
@@ -110,7 +112,10 @@ export default function FlowContent() {
 				);
 			case 2:
 				if (!flows) return <h1>Loading...</h1>;
-				return <RenderFlows flows={flows} subUrl={subUrl} />;
+				return <RenderFlows flows={flows} subUrl={subUrl} setStep={setStep} />;
+			case 3:
+				if (!session) return <h1>Loading...</h1>;
+				return <ReportPage sessionID={session} />;
 			default:
 				return <h1>hello</h1>;
 		}

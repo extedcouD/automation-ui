@@ -22,19 +22,10 @@ const difficultyOptions: DifficultyOption[] = [
 		id: "stopAfterFirstNack",
 		label: "Stop After First NACK",
 		description:
-			"Determines if the process should stop after the first negative acknowledgment.",
+			"Determines if the flow should stop after the first negative acknowledgment.",
 		options: [
 			{ label: "No", value: "no", points: 0 },
 			{ label: "Yes", value: "yes", points: 20 },
-		],
-	},
-	{
-		id: "sensitiveTTL",
-		label: "Sensitive TTL",
-		description: "every async call has a very sensitve ttl.",
-		options: [
-			{ label: "No", value: "no", points: 0 },
-			{ label: "Yes", value: "yes", points: 15 },
 		],
 	},
 	{

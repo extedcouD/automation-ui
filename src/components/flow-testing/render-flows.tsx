@@ -18,9 +18,11 @@ interface SessionData {
 function RenderFlows({
 	flows,
 	subUrl,
+	setStep,
 }: {
 	flows: FetchFlowsResponse;
 	subUrl: string;
+	setStep: any;
 }) {
 	const [sessionData, setSessionData] = useState<SessionData | null>(null);
 	const [activeFlow, setActiveFlow] = useState<string | null>(null);
@@ -39,7 +41,6 @@ function RenderFlows({
 				subUrl
 			)
 				.then((response) => {
-					toast.success(`${activeFlow} has started`);
 					console.log("response", response.data);
 				})
 				.catch((e) => {
@@ -67,7 +68,6 @@ function RenderFlows({
 
 	async function fetchPayloads() {
 		try {
-			console.log("activeFlow", activeFlowRef.current);
 			if (activeFlowRef.current === null) return;
 
 			const response = await axios.get(
@@ -80,10 +80,9 @@ function RenderFlows({
 			};
 
 			setCacheData(data);
-			console.log("response", response.data);
 		} catch (e) {
 			toast.error("Error while fetching payloads");
-			console.log("error while fetching payloads", e);
+			console.error("error while fetching payloads", e);
 		}
 	}
 
@@ -121,6 +120,12 @@ function RenderFlows({
 			) : (
 				<div>Loading...</div>
 			)}
+			<button
+				className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+				onClick={() => setStep((s: any) => s + 1)}
+			>
+				End Session
+			</button>
 			<div className="flex flex-wrap w-full">
 				<div className="mt-2 w-[50%]">
 					{flows.domain.map((domain) => (
@@ -174,8 +179,9 @@ function Accordion({
 			if (cacheData.session_payloads[flow.id].length === 0) {
 				await triggerSearch(cacheData);
 			}
-		} catch {
+		} catch (e) {
 			toast.error("Error while starting flow");
+			console.error(e);
 		}
 	};
 	let stepIndex = 0;

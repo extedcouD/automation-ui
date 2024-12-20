@@ -17,7 +17,7 @@ export function GetCurrentState(
 		return "inactive";
 	}
 	const response = flowData[index].response;
-	if (response.message.ack.status === "ACK") {
+	if (response?.message?.ack?.status === "ACK") {
 		return "success";
 	} else {
 		return "error";
