@@ -2,15 +2,11 @@ import { useState } from "react";
 import Editor from "@monaco-editor/react";
 import Markdown from "react-markdown";
 import axios from "axios";
-import { marked } from "marked";
 import { toast } from "react-toastify";
 
 interface IProps {
   isSidebarOpen: boolean;
 }
-
-const MARKDOWN = `- **condition A**: $.context.domain must be present in the payload/n/n _note: find complete list of [validations](https://8810-182-156-19-250.ngrok-free.app/test)_
-  `;
 
 const ApiTesting = ({ isSidebarOpen }: IProps) => {
   const [payload, setPayload] = useState("");
@@ -42,8 +38,9 @@ const ApiTesting = ({ isSidebarOpen }: IProps) => {
       setResponseValue(JSON.stringify(response.data, null, 2));
       if (response.data?.error?.message) {
         setMdData(response.data?.error?.message);
+      } else {
+        setMdData("```\n" + JSON.stringify(response.data, null, 2) + "\n```");
       }
-      setMdData;
     } catch (e) {
       console.log(">>>>>", e);
       toast.error("Something went wrong");
@@ -88,25 +85,37 @@ const ApiTesting = ({ isSidebarOpen }: IProps) => {
             }}
           />
         </div>
-        <div className="h-2/5 p-3 border bg-white shadow-md">
-          <Markdown
-            components={{
-              a: ({ href, children }: any) => (
-                <a
-                  href={href}
-                  className="text-blue-500 underline hover:text-blue-700"
-                >
-                  {children}
-                </a>
-              ),
-              ul: ({ children }: any) => (
-                <ul className="list-disc pl-5">{children}</ul>
-              ),
-              li: ({ children }: any) => <li className="mb-2">{children}</li>,
-            }}
-          >
-            {mdData}
-          </Markdown>
+        <div className="h-2/5 p-3 border bg-white shadow-md overflow-y-scroll">
+          <div class="pr-4">
+            <Markdown
+              components={{
+                a: ({ href, children }: any) => (
+                  <a
+                    href={href}
+                    className="text-blue-500 underline hover:text-blue-700"
+                  >
+                    {children}
+                  </a>
+                ),
+                ul: ({ children }: any) => (
+                  <ul className="list-disc pl-5">{children}</ul>
+                ),
+                li: ({ children }: any) => <li className="mb-2">{children}</li>,
+                code: ({ inline, children }: any) =>
+                  inline ? (
+                    <code className="bg-gray-100 text-red-600 rounded px-1">
+                      {children}
+                    </code>
+                  ) : (
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto">
+                      <code>{children}</code>
+                    </pre>
+                  ),
+              }}
+            >
+              {mdData}
+            </Markdown>
+          </div>
         </div>
       </div>
     </div>
